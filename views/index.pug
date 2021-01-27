@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #[em Restaurant], a very basic Express website.
+
+  h1 Dynamic content
+
+  if error
+    p Error getting dynamic content.
+  else
+    p The restaurant has the following record counts:
+
+    ul
+      li #[strong Table:] !{data.table_instance_count}
+      li #[strong Table types count:] !{data.table_count}
+    

@@ -1,0 +1,15 @@
+extends layout
+
+block content
+        h1= title
+
+        ul(class='table_list')
+            each table in tableinstance_list
+                li
+                    a(href=table.url) № #{table.number}
+                    ul(class='table_info') 
+                        li Seats: #{table.table.seats}
+                        li Location: #{table.location}
+
+            else
+                li There are no tables.
