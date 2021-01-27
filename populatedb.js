@@ -30,23 +30,7 @@ var tableinstances = []
 //var reservations = []
 
 
-/*
-function customerCreate(first_name, family_name, email, phone, cb){
-  customerdetail = {first_name: first_name, family_name: family_name, email: email}
-  if (phone != false) customerdetail.phone = phone
 
-  var customer = new Customer(customerdetail);
-
-  customer.save(function(err){
-    if (err){
-      cb(err, null)
-      return
-    }
-    console.log('New Customer: ' + customer)
-    customers.push(customer)
-    cb(null, customer)
-  });
-}*/
 
 function tableCreate(seats, cb){
   tabledetail = {seats: seats}

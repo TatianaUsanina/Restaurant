@@ -1,4 +1,11 @@
 extends layout
 
 block content
+    h1 #{title} 
     p #{text}
+    p #[strong Name: ] #{customer.first_name}
+    p #[strong Family Name: ] #{customer.family_name}
+    p #[strong Date: ] #{date}
+    p #[strong Your table №]#{table.number}
+    
+    

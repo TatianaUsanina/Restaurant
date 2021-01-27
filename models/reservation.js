@@ -7,6 +7,7 @@ var ReservationSchema = new Schema(
         tableinstance: {
             type: Schema.ObjectId,
             ref: 'TableInstance',
+            required: true
         },
         customer: {
             type: Schema.ObjectId,

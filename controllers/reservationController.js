@@ -2,6 +2,7 @@ var Reservation = require('../models/reservation');
 var Customer = require('../models/customer');
 var TableInstance = require('../models/tableinstance');
 const validator = require('express-validator');
+var async = require('async');
 
 
 //Показать список всех броней
@@ -10,8 +11,25 @@ exports.reservations_list = function(req, res){
 };
 
 // Показать подробную страницу для данной брони.
-exports.reservation_detail = function(req, res) {
-    res.render('resrervation_succses', {text: 'Reservation done succsesfully!'});
+exports.reservation_detail = function(req, res, next) {    
+
+           var reservation =  Reservation.findById(req.params.id, function(err, doc){
+               if(err) {return next(err)};
+               if (doc==null){
+                    var err = new Error('Reservation not found');
+                    err.status = 404;
+                    return next(err);
+                } 
+                Customer.findById(doc.customer, function(err, cust){
+                    if(err) {return next(err)};
+                    TableInstance.findById(doc.tableinstance, function(error, table){
+                        if(error) {return next(err)};
+                        res.render('resrervation_succses', {title: 'Reservation Done!', text: 'Reservation done succsesfully!', date: doc.date, customer: cust, table: table});
+
+                    })
+
+                })
+           });
 };
 
 // Показать форму создания брони по запросу GET.
@@ -47,32 +65,42 @@ exports.reservation_create_post = [
     (req, res, next) => {
         const errors = validator.validationResult(req);
 
-        var customer = new Customer({
-            first_name: req.body.name,
-            family_name: req.body.family_name,
-            email: req.body.email,
-            phone: req.body.phone
-        });
+        Customer.findOne({email: req.body.email}, function(err, customer){
+            if (customer == null){
+                customer = new Customer({
+                    first_name: req.body.name,
+                    family_name: req.body.family_name,
+                    email: req.body.email,
+                    phone: req.body.phone
+                });
+                customer.save(function(err){
+                    if (err) {return next(err);}
+                    
+                });
+            }
 
-        customer.save(function(err){
-            if (err) {return next(err);}
-            
-        });
-
-        var table = TableInstance.findOne({'number': req.body.table}).exec();
+            TableInstance.findOne({'number': req.body.table}, function(error, tab){    
+                if (error) {return next(error)};     
+                if(tab == null) {
+                    var err = new Error('Table not found');
+                    err.status = 404;
+                    return next(err);
+                }   
+                var reservation = new Reservation({
+                    tableinstance: tab,
+                    customer: customer,
+                    date: req.body.date
+                });
         
-        var reservation = new Reservation({
-            table: table,
-            customer: customer,
-            date: req.body.date
+                reservation.save(function(err){
+                    if (err) {return next(err);}
+                    res.redirect(reservation.url);
+                });            
+            });
         });
+    }    
+];
 
-        reservation.save(function(err){
-            if (err) {return next(err);}
-            res.redirect(reservation.url);
-        });
-    }
-]
 
 // Показать форму удаления стола по запросу GET.
 exports.reservation_delete_get = function(req, res) {
